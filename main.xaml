@@ -80,7 +80,7 @@
                                          Style="{StaticResource MaterialDesignTabRadioButton}"
                                          Margin="4"
                                          IsChecked="True"
-                                         Content="AD" />
+                                         Content="Réinitilisation de mot de passe Active Directory" />
                         </StackPanel>
                     </materialDesign:ColorZone>
                     <StackPanel Height="60"
@@ -118,24 +118,9 @@
                             VerticalAlignment="Top"
                             Width="140"
                             Margin="319,112,0,0" />
-                             <StackPanel  Orientation="Horizontal"
-                                     Margin="319,150,0,0"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Top"
-                                     Height="25"                                    
-                                     Name="chk_inactif_agile_t"
-                                     Visibility="Visible">
-                            <ToggleButton Padding="2"
-                                          Name="chk_inactif_agile"
-                                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                          ToolTip="MaterialDesignSwitchToggleButton"
-                                          IsChecked="False"
-                                          Margin="0,0,0,0" />
-                            <Label Content="Inactif"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Margin="0,2,0,-1"
-                                   Width="58" />
+                           
+                          
+                           
                         </StackPanel>
                 </Grid>
 

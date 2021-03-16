@@ -102,25 +102,15 @@ function Set-AdPassword {
 }
 
 $user = $null ;
-$GLOBAL:user_ad = get-aduser -filter { Enabled -eq $true }  
+$user_ad = get-aduser -filter { Enabled -eq $true }  
 
-$chk_inactif_agile.IsChecked = ''
-
-$chk_inactif_agile.Add_UnChecked( {
-        $GLOBAL:user_ad = Get-ADUser -Filter { enabled -eq $true } -Properties * | ? { ($_.AccountExpirationDate -eq $NULL -or $_.AccountExpirationDate -gt (Get-Date)) } 
-    })
-$chk_inactif_agile.Add_Checked( {
-        $GLOBAL:user_ad = Get-ADUser -Filter { enabled -eq $false } -Properties * | ? { ($_.AccountExpirationDate -eq $NULL -or $_.AccountExpirationDate -lt (Get-Date)) } 
-    })
- 
 $Recherche_mdp_ad.Add_TextChanged( {     
         $list_mdp_ad.Items.Clear()
-        $GLOBAL:unique_user = $user_ad | ? { $_.Name -like "*$($Recherche_mdp_ad.text)*" -or $_.samaccountname -like "*$($Recherche_mdp_ad.text)*" }
-
+        $unique_user = $user_ad | Where-Object { $_.Name -like "*$($Recherche_mdp_ad.text)*" -or $_.samaccountname -like "*$($Recherche_mdp_ad.text)*" }
         foreach ($a in $unique_user) {  
             $cleanUser = $a.samaccountname -replace "_", "__"
             $item_ad = $cleanUser + " - " + $a.name                          
-            $list_mdp_ad.Items.Add($item_ad)          
+            $list_mdp_ad.Items.Add($item_ad)         
         
         }
     
