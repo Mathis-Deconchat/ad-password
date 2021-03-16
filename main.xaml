@@ -1,0 +1,149 @@
+﻿<Window x:Class="admin_gui_04052020.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:admin_gui_04052020"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Admin v.2"
+        Height="520"
+        Width="500">
+    <!-- Ressources -->
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <!-- Primary colour -->
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Blue.xaml" />
+                    </ResourceDictionary.MergedDictionaries>
+
+                    <SolidColorBrush x:Key="PrimaryHueLightBrush"
+                                     Color="{StaticResource Primary100}" />
+                    <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush"
+                                     Color="{StaticResource Primary100Foreground}" />
+                    <SolidColorBrush x:Key="PrimaryHueMidBrush"
+                                     Color="{StaticResource Primary500}" />
+                    <SolidColorBrush x:Key="PrimaryHueMidForegroundBrush"
+                                     Color="{StaticResource Primary500Foreground}" />
+                    <SolidColorBrush x:Key="PrimaryHueDarkBrush"
+                                     Color="{StaticResource Primary700}" />
+                    <SolidColorBrush x:Key="PrimaryHueDarkForegroundBrush"
+                                     Color="{StaticResource Primary700Foreground}" />
+                </ResourceDictionary>
+
+                <!-- secondary colour -->
+                <ResourceDictionary>
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Yellow.xaml" />
+                    </ResourceDictionary.MergedDictionaries>
+                    <SolidColorBrush x:Key="SecondaryAccentBrush"
+                                     Color="{StaticResource Accent200}" />
+                    <SolidColorBrush x:Key="SecondaryAccentForegroundBrush"
+                                     Color="{StaticResource Accent200Foreground}" />
+                </ResourceDictionary>
+
+                <!-- Include the Dragablz Material Design style -->
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- tell Dragablz tab control to use the Material Design theme -->
+            <Style TargetType="{x:Type dragablz:TabablzControl}"
+                   BasedOn="{StaticResource MaterialDesignTabablzControlStyle}" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <!-- Grid GLOBALE -->
+    <Grid>
+        <dragablz:TabablzControl HorizontalAlignment="Center"
+                                 Height="500"
+                                 VerticalAlignment="Top"
+                                 Width="493"
+                                 Name="TabBoy">
+            <dragablz:TabablzControl.InterTabController>
+                <dragablz:InterTabController />
+            </dragablz:TabablzControl.InterTabController>
+
+            <!-- AD -->
+            <TabItem Header="AD"
+                     Name="AD">
+                <Grid>
+                    <materialDesign:ColorZone Mode="PrimaryLight"
+                                              Grid.ColumnSpan="2"
+                                              Margin="0,0,0,0">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,2,2,2"
+                                    RenderTransformOrigin="0.636,0.551">
+                            <RadioButton Name="radio_ad"
+                                         Style="{StaticResource MaterialDesignTabRadioButton}"
+                                         Margin="4"
+                                         IsChecked="True"
+                                         Content="AD" />
+                        </StackPanel>
+                    </materialDesign:ColorZone>
+                    <StackPanel Height="60"
+                                Width="263"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="10,61,0,0">
+                        <TextBox Name="recherche_mdp_ad"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 VerticalAlignment="Top"
+                                 materialDesign:TextFieldAssist.HasClearButton="True"
+                                 Margin="26,0,10,0">
+                            <materialDesign:HintAssist.Hint>
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="-2 0 0 0">
+                                    <materialDesign:PackIcon Kind="Account" />
+                                    <TextBlock><Run Text="Utilisateur" /></TextBlock>
+                                </StackPanel>
+                            </materialDesign:HintAssist.Hint>
+                        </TextBox>
+                    </StackPanel>
+                    <ListBox Name="list_mdp_ad"
+                             Margin="34,112,227,60"
+                             BorderThickness="1"
+                             BorderBrush="LightGray" />
+                    <Button Content="Reinitialiser"
+                            Name="but_reinit_ad"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Width="140"
+                            Margin="319,75,0,0" />
+                    <Button Content="Infos"
+                            Name="but_infos_ad"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Width="140"
+                            Margin="319,112,0,0" />
+                             <StackPanel  Orientation="Horizontal"
+                                     Margin="319,150,0,0"
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Top"
+                                     Height="25"                                    
+                                     Name="chk_inactif_agile_t"
+                                     Visibility="Visible">
+                            <ToggleButton Padding="2"
+                                          Name="chk_inactif_agile"
+                                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                          ToolTip="MaterialDesignSwitchToggleButton"
+                                          IsChecked="False"
+                                          Margin="0,0,0,0" />
+                            <Label Content="Inactif"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="0,2,0,-1"
+                                   Width="58" />
+                        </StackPanel>
+                </Grid>
+
+            </TabItem>
+
+
+
+        </dragablz:TabablzControl>
+
+    </Grid>
+</Window>
