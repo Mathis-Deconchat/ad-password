@@ -1,4 +1,4 @@
-﻿[Environment]::CurrentDirectory = "M:\ShadowScriptv1\admin"
+﻿[Environment]::CurrentDirectory = $PSScriptRoot
 
 # Chargement des assembly pour la partie graphique, elles se situent dans le dossier assembly
 
@@ -11,13 +11,25 @@
 # Crï¿½er le dossier de log ainsi que le fichier de log
 if (!(test-path $env:userprofile\log)) {
     new-item -path $env:userprofile\log -ItemType Directory | Out-Null
-    new-item -path $env:userprofile\log\log_pem.txt -ItemType File | Out-Null
+    new-item -path $env:userprofile\log\log_reinit.txt -ItemType File | Out-Null
 }
 
-# Log la connexion de utilisateur
-$dat = get-date -format "yyyy/MM/dd HH:mm"
-$log = "[$dat]//: $env:username start app..."
-Add-Content -Value $log -Path $env:userprofile\log\log_pem.txt -Force
+function Log {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string]
+        $message
+    )
+    $date = get-date -format "yyyy/MM/dd HH:mm"
+    $user = $env:username
+    $log = "[$date] : $user // $message"
+    Add-Content -Value $log -Path $env:userprofile\log\log_reinit.txt -Force
+
+}
+
+Log -message "Lance l'application"
+
 
 # Fonction pour charger des fichiers XAML
 function LoadXaml ($filename) {    
@@ -39,80 +51,56 @@ $xaml.SelectNodes("//*[@Name]") | ForEach-Object { Set-Variable -Name ($_.Name) 
 
 
 ##########
-# REINIT_MDP_AD
+# 
 ##########
-function infos_ad {
-    $user = $($List_mdp_ad.SelectedItem -split " -")[0] 
-    $user = $user -replace "__", "_"
+function Get-AdInfos {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string]
+        $user
+    )    
     Start-Process powershell.exe -argument " .\scripts\infos_ad.ps1 -user $user" -WindowStyle Hidden
 }
 
 ##########
-# REINIT_MDP_AD
+# 
 ##########
-## Rï¿½initialise le mot de passe AD
-function REINIT_MDP_AD {
+function Set-AdPassword {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String]
+        $user
+    )
     $dom = $null
-    # Sï¿½lectionne le nom d'utilisateur dans la liste (prends uniquement le nom user car liste est composï¿½ de {username} - {nom complet}
-    $user = $($List_mdp_ad.SelectedItem -split " -")[0] 
-    $user = $user -replace "__", "_"
-    Add-Type -AssemblyName 'System.Web' 
-    ## Création du mot de passe aléatoire - API motdepasse.xyz - 12 charactères : chiffres / MAJ / MINUSCULES / caractères similaires exclus
+    Add-Type -AssemblyName 'System.Web'
     $Pass = Invoke-RestMethod -Uri "https://api.motdepasse.xyz/create/?include_digits&include_lowercase&include_uppercase&include_special_characters&exclude_similar_characters&password_length=12&quantity=1"
-    $Password = [string]$Pass.passwords
-    $Password = $Password -replace '<', '@' -replace '>', '_' 
-    # Set le password
+    $Password = [string]$Pass.passwords    
+    
     Set-ADAccountPassword -Identity $user -Reset -NewPassword (ConvertTo-SecureString -AsPlainText $Password -Force )
-    write-host $user
+    
     
     $CurrentDomain = 'LDAP://' + ([ADSI]"").distinguishedName
     $dom = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain, $User, $Password) 
     $res = $dom.path
 
 
-    if ( $res -ne $null) {  
+    if ( $res -ne $null) { 
+        $password  | clip
+        $message = "Mot de passe réinitialisé pour $user avec $password `n✔ Copié dans le presse papier "
+        Start-Process powershell.exe -argument " .\scripts\message.ps1 -message '$message'" -NoNewWindow        
+        Log -message "réintialiser le mot de passe de [USER: $user]."
         
-        $Message = 'Bonjour,
-
-
-Votre mot de passe a été réinitialisé à : '+ $password + '
-
-
-Afin de le modifier, après vous être connecté au serveur, utiliser le raccourci "Chgt MDP Agile" présent sur votre bureau.
-
-
-Puis sélectionner l''option "Modifier un mot de passe".
-
-
-Il doit répondre aux conditions suivantes :
-
-- Une longueur minimum de 12 caractères avec au moins une minuscule, une majuscule, un chiffre et un caractère spécial.
-
-- Impossibilité de réutiliser les 5 derniers mots de passe.
-
-
-Nous restons à votre disposition pour tout renseignement complémentaire.
-
-
-Bien cordialement,
- '
-    
-        $OutputEncoding = (New-Object System.Text.UnicodeEncoding $False, $False).psobject.BaseObject
-        $Message | clip
-        Start-Process powershell.exe -argument " .\scripts\message.ps1 -ok ok -user $user" -NoNewWindow
-
-        $dat = get-date -format "yyyy/MM/dd HH:mm:ss"
-        $log = "[$dat]//: [TECH: $env:username] a réintialiser le mot de passe de [USER: $user]."
-        Add-Content -Value $log -Path $env:userprofile\log\log_pem.txt -Force  
+    }
+    else {
+        $wshell = New-Object -ComObject Wscript.Shell
+        $wshell.Popup("Réinitilisation KO", 4, "Erreur de réinitialisation", 0x0 + 16)
     }
 
 
 }
 
-#_______________________#
-## TAB AD
-#_______________________#
-# Click sur le bouton de rï¿½intialisation de l'AD
 $user = $null ;
 $GLOBAL:user_ad = get-aduser -filter { Enabled -eq $true }  
 
@@ -131,21 +119,38 @@ $Recherche_mdp_ad.Add_TextChanged( {
 
         foreach ($a in $unique_user) {  
             $cleanUser = $a.samaccountname -replace "_", "__"
-            $item_ad = $cleanUser + " - " + $a.name
-                          
-            $list_mdp_ad.Items.Add("$item_ad")
-            #$list_mdp_ad.Items.Add.Value('pomme')
+            $item_ad = $cleanUser + " - " + $a.name                          
+            $list_mdp_ad.Items.Add($item_ad)          
         
         }
     
-    }) # FIN RECHERCHE AD TEXT CHANGED
+    }) 
 
 $but_reinit_ad.Add_Click( {
-        REINIT_MDP_AD
+        if ($List_mdp_ad.SelectedItem.length -gt 0) {
+            $user = $($List_mdp_ad.SelectedItem -split " -")[0] 
+            $user = $user -replace "__", "_"
+            Set-AdPassword -user $user
+        }
+        else {
+            $wshell = New-Object -ComObject Wscript.Shell
+            $wshell.Popup("Veuillez sélectionner un utilisateur", 4, "Erreur de sélection", 0x0 + 16)
+        }
+        
     })
 
 $but_infos_ad.Add_Click( {
-        INFOS_AD
+        
+        if ($List_mdp_ad.SelectedItem.length -gt 0) {
+            $user = $($List_mdp_ad.SelectedItem -split " -")[0] 
+            $user = $user -replace "__", "_"
+            Get-AdInfos -user $user
+        }
+        else {
+            $wshell = New-Object -ComObject Wscript.Shell
+            $wshell.Popup("Veuillez sélectionner un utilisateur", 4, "Erreur de sélection", 0x0 + 16)
+        }
+        
     })
 
 
