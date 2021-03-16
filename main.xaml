@@ -118,10 +118,7 @@
                             VerticalAlignment="Top"
                             Width="140"
                             Margin="319,112,0,0" />
-                           
-                          
-                           
-                        </StackPanel>
+                             
                 </Grid>
 
             </TabItem>
