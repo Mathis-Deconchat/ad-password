@@ -8,3 +8,6 @@ Assembly:\
 
 ### UI
 ![Image of Yaktocat](https://raw.githubusercontent.com/Mathis-Deconchat/ad-password/main/img/front.JPG)
+
+La barre de recherche permet de rechercher autant des utilisateurs par leur SamAccountName que par leur noms complets\
+La valeurs sélectionné au moment de la réinitilisation est celle de la liste en dessous.
